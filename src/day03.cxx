@@ -66,7 +66,7 @@ int main(int argc, char **argv)
     return 1;
   }
 
-  size_t target_two{249};
+  size_t target_two{1260601650};
   size_t result_two = part_two(toboggan);
   bool ok_two = target_two == result_two;
   std::cout << "Part 2: " << target_two << (ok_two ? " == " : " != ") << result_two << std::endl;
