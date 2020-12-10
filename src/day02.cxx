@@ -34,7 +34,7 @@ size_t part_one(const std::filesystem::path &file)
   return counter;
 }
 
-int part_two(const std::filesystem::path &file)
+size_t part_two(const std::filesystem::path &file)
 {
   std::ifstream input_file(file);
 
