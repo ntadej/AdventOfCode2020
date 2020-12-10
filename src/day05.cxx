@@ -1,41 +1,9 @@
-#include <array>
+#include <algorithm>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <string>
-
-constexpr size_t rows{127};
-constexpr size_t seats{7};
-
-size_t get_row(const std::string &id,
-               size_t min,
-               size_t max)
-{
-  if (id.empty()) {
-    return min;
-  }
-
-  if (id[0] == 'F') {
-    return get_row(id.substr(1), min, (max + min) / 2);
-  }
-
-  return get_row(id.substr(1), (max + min) / 2 + 1, max);
-}
-
-size_t get_seat(const std::string &id,
-                size_t min,
-                size_t max)
-{
-  if (id.empty()) {
-    return min;
-  }
-
-  if (id[0] == 'L') {
-    return get_seat(id.substr(1), min, (max + min) / 2);
-  }
-
-  return get_seat(id.substr(1), (max + min) / 2 + 1, max);
-}
+#include <vector>
 
 size_t part_one(const std::filesystem::path &file)
 {
@@ -44,9 +12,11 @@ size_t part_one(const std::filesystem::path &file)
   size_t max{};
   std::string line;
   while (std::getline(input_file, line)) {
-    size_t row = get_row(line.substr(0, 7), 0, rows);
-    size_t seat = get_seat(line.substr(7), 0, seats);
-    size_t id = row * 8 + seat;
+    std::replace(line.begin(), line.end(), 'F', '0');
+    std::replace(line.begin(), line.end(), 'B', '1');
+    std::replace(line.begin(), line.end(), 'L', '0');
+    std::replace(line.begin(), line.end(), 'R', '1');
+    size_t id = std::stoul(line, nullptr, 2);
     if (id > max) {
       max = id;
     }
@@ -59,18 +29,22 @@ size_t part_two(const std::filesystem::path &file)
 {
   std::ifstream input_file(file);
 
-  std::array<bool, (rows + 1) * 8> list{};
+  std::vector<size_t> ids;
 
   std::string line;
   while (std::getline(input_file, line)) {
-    size_t row = get_row(line.substr(0, 7), 0, rows);
-    size_t seat = get_seat(line.substr(7), 0, seats);
-    list[row * 8 + seat] = true;
+    std::replace(line.begin(), line.end(), 'F', '0');
+    std::replace(line.begin(), line.end(), 'B', '1');
+    std::replace(line.begin(), line.end(), 'L', '0');
+    std::replace(line.begin(), line.end(), 'R', '1');
+    ids.emplace_back(std::stoul(line, nullptr, 2));
   }
 
-  for (size_t i = 1; i < (rows + 1) * 8 - 1; ++i) {
-    if (!list[i] && list[i - 1] && list[i + 1]) {
-      return i;
+  std::sort(ids.begin(), ids.end());
+
+  for (size_t i = 0; i < ids.size() - 1; ++i) {
+    if (ids[i + 1] - ids[i] == 2) {
+      return ids[i] + 1;
     }
   }
 
